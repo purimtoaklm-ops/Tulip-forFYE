@@ -1,0 +1,470 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ดอกไม้ของเธอ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one full-bleed night-garden scene with a single tulip, and a floating bottom panel that carries the words.
+   The camera (SVG viewBox) follows the growth. A single dark look by choice, so there are no light-theme overrides. */
+:root {
+  --bg: #17161a;
+  --sky-top: #131216;
+  --sky-bot: #26212a;
+  --ground: #2d262f;
+  --ground-hi: #3b303a;
+  --stem: #94d1ab;
+  --leaf-a: #b2e1c1;
+  --leaf-b: #5fa87e;
+  --out-a: #f4a3c1;
+  --out-b: #d65f8c;
+  --mid-a: #ffb8d0;
+  --mid-b: #ff7aab;
+  --in-a: #ffdfea;
+  --in-b: #ff98bd;
+  --fg: #fff1f6;
+  --muted: #d3bcc6;
+  --accent: #ff9fc0;
+  --on-accent: #2c1620;
+  --sheet: rgba(26, 24, 30, 0.84);
+  --line: rgba(255, 190, 215, 0.18);
+  --font-body: "Mali", "Sarabun", "Noto Sans Thai", sans-serif;
+  --font-ui: "Itim", "Mali", "Sarabun", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(var(--sky-top), var(--sky-bot));
+}
+.instant * { transition: none !important; }
+
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* plant parts */
+.stem { stroke: var(--stem); }
+.lf { fill: url(#gLeaf); }
+.vein { fill: none; stroke: #fff; stroke-opacity: 0.26; stroke-width: 1.6; stroke-linecap: round; }
+.p1 { fill: url(#gOut); }
+.p2 { fill: url(#gMid); }
+.p3 { fill: url(#gIn); }
+.petal { transform-origin: 0 0; transition: transform 3.4s cubic-bezier(0.25, 0.7, 0.2, 1), opacity 1.4s ease; }
+.petal.active path:first-child { filter: drop-shadow(0 0 10px rgba(255, 150, 190, 0.6)); }
+.zoomed .petal:not(.active) { opacity: 0.5; }
+.leaf { transform-origin: 0 0; transition: transform 1.8s cubic-bezier(0.3, 0.8, 0.3, 1); }
+#head { transition: opacity 1.8s ease; }
+.ground { fill: url(#gGround); }
+.ground-line { fill: none; stroke: #ffc0d6; stroke-opacity: 0.14; stroke-width: 1.5; }
+.seed { transform-box: fill-box; transform-origin: center; transition: opacity 1.2s ease, transform 1.2s ease; }
+.seed.gone { opacity: 0; transform: scale(0.3); }
+.seed-body { fill: #f0c2a6; }
+.seed-shine { fill: #fff2e6; fill-opacity: 0.7; }
+.halo { fill: none; stroke: var(--accent); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: halo 2.8s ease-in-out infinite; }
+@keyframes halo { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 0.6; transform: scale(1.15); } }
+
+/* atmosphere */
+.glow {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  transition: opacity 3.5s ease;
+  background: radial-gradient(70% 50% at 50% 38%, rgba(255, 143, 183, 0.36), rgba(255, 143, 183, 0) 70%);
+}
+.flies { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.fly {
+  position: absolute; border-radius: 50%; background: #ffd9e6; opacity: 0;
+  box-shadow: 0 0 8px 2px rgba(255, 170, 205, 0.55);
+  animation: drift var(--d) ease-in-out infinite, twinkle var(--t) ease-in-out infinite;
+}
+@keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(var(--x), var(--y)); } }
+@keyframes twinkle { 0%, 100% { opacity: 0.08; } 50% { opacity: 0.8; } }
+
+/* panel */
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  pointer-events: none;
+}
+.panel {
+  max-width: 520px; margin: 0 auto; box-sizing: border-box;
+  padding: 16px 18px 18px;
+  background: var(--sheet);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  display: flex; flex-direction: column; gap: 12px;
+  pointer-events: auto;
+}
+.dots { display: flex; gap: 8px; justify-content: center; }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line); box-sizing: border-box; transition: background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease; }
+.dot.on { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 159, 192, 0.7); }
+.msg { min-height: calc(1.75em * 3); display: flex; flex-direction: column; justify-content: center; font-size: 17px; }
+.txt, .sign { margin: 0; line-height: 1.75; text-align: center; text-wrap: pretty; opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.sign { font-family: var(--font-ui); color: var(--accent); text-align: right; margin-top: 4px; }
+.txt.show, .sign.show { opacity: 1; transform: none; transition-duration: 0.9s; }
+.btn {
+  appearance: none; border: 0; cursor: pointer;
+  height: 48px; width: 100%; border-radius: 999px;
+  background: var(--accent); color: var(--on-accent);
+  font-family: var(--font-ui); font-size: 19px; letter-spacing: 0.02em;
+  transition: opacity 0.4s ease, transform 0.15s ease, filter 0.2s ease;
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: scale(0.98); }
+.btn[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+.btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+@media (max-width: 520px) { .msg { min-height: calc(1.75em * 4); } }
+@media (prefers-reduced-motion: reduce) {
+  .petal, .leaf, #head { transition-duration: 0.4s !important; }
+  .fly { animation: none; opacity: 0.3; }
+  .halo { animation: none; opacity: 0.4; }
+}
+</style>
+
+<div class="stage" id="stage">
+  <svg id="scene" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="ทิวลิปที่ค่อย ๆ โตจากเมล็ดเล็ก ๆ จนบาน">
+    <defs>
+      <linearGradient id="gOut" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-112">
+        <stop offset="0" style="stop-color: var(--out-b)"/>
+        <stop offset="1" style="stop-color: var(--out-a)"/>
+      </linearGradient>
+      <linearGradient id="gMid" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-112">
+        <stop offset="0" style="stop-color: var(--mid-b)"/>
+        <stop offset="1" style="stop-color: var(--mid-a)"/>
+      </linearGradient>
+      <linearGradient id="gIn" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-112">
+        <stop offset="0" style="stop-color: var(--in-b)"/>
+        <stop offset="1" style="stop-color: var(--in-a)"/>
+      </linearGradient>
+      <linearGradient id="gLeaf" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="0">
+        <stop offset="0" style="stop-color: var(--leaf-b)"/>
+        <stop offset="1" style="stop-color: var(--leaf-a)"/>
+      </linearGradient>
+      <linearGradient id="gGround" gradientUnits="userSpaceOnUse" x1="0" y1="590" x2="0" y2="720">
+        <stop offset="0" style="stop-color: var(--ground-hi)"/>
+        <stop offset="1" style="stop-color: var(--ground)"/>
+      </linearGradient>
+    </defs>
+
+    <path id="stem" class="stem" d="M200,612 C196,540 206,470 201,400 C197,345 203,300 200,262" fill="none" stroke-width="6" stroke-linecap="round"/>
+    <g id="leaves"></g>
+
+    <g id="head" style="opacity: 0">
+      <g id="petals"></g>
+    </g>
+
+    <path class="ground" d="M-2000,612 C-600,588 -200,596 200,592 C600,588 1000,598 2400,610 L2400,1400 L-2000,1400 Z"/>
+    <path class="ground-line" d="M-2000,612 C-600,588 -200,596 200,592 C600,588 1000,598 2400,610"/>
+
+    <g id="seed" class="seed">
+      <circle class="halo" cx="200" cy="598" r="16"/>
+      <ellipse class="seed-body" cx="200" cy="598" rx="8" ry="5.5"/>
+      <ellipse class="seed-shine" cx="197.5" cy="596.2" rx="2.6" ry="1.4"/>
+    </g>
+  </svg>
+
+  <div class="glow" id="glow"></div>
+  <div class="flies" id="flies" aria-hidden="true"></div>
+
+  <div class="sheet">
+    <div class="panel">
+      <div class="dots" id="dots" role="img" aria-label="กลีบที่บานแล้ว 0 จาก 6"></div>
+      <div class="msg" aria-live="polite">
+        <p class="txt" id="txt"></p>
+        <p class="sign" id="sign" hidden>ให้อ้วน</p>
+      </div>
+      <button class="btn" id="btn" type="button">กดๆๆๆ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var stage = document.getElementById('stage');
+  var svg = document.getElementById('scene');
+  var stem = document.getElementById('stem');
+  var head = document.getElementById('head');
+  var petalsG = document.getElementById('petals');
+  var leavesG = document.getElementById('leaves');
+  var seed = document.getElementById('seed');
+  var glow = document.getElementById('glow');
+  var flies = document.getElementById('flies');
+  var dotsEl = document.getElementById('dots');
+  var txt = document.getElementById('txt');
+  var sign = document.getElementById('sign');
+  var btn = document.getElementById('btn');
+
+  var L = stem.getTotalLength();
+  var tip = stem.getPointAtLength(L);
+  var hx = tip.x, hy = tip.y;
+  stem.style.strokeDasharray = L;
+  stem.style.strokeDashoffset = L;
+
+  function mk(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function tf(a, s) { return 'translate(' + hx + 'px,' + hy + 'px) rotate(' + a + 'deg) scale(' + s + ')'; }
+
+  /* tulip petals: three layers of two, outer to inner. Messages follow this order. */
+  var PETAL = 'M0,0 C-38,-10 -46,-62 -3,-110 Q0,-114 3,-110 C46,-62 38,-10 0,0 Z';
+  var VEIN = 'M0,-12 L0,-84';
+  var OPEN_A = [-34, 34, -20, 20, -7, 7];
+  var OPEN_S = [0.96, 0.96, 1, 1, 0.9, 0.9];
+  var LAYER = ['p1', 'p1', 'p2', 'p2', 'p3', 'p3'];
+  var petals = OPEN_A.map(function (a, i) {
+    var g = mk('g', { 'class': 'petal' }, petalsG);
+    mk('path', { d: PETAL, 'class': LAYER[i] }, g);
+    mk('path', { d: VEIN, 'class': 'vein' }, g);
+    g.style.transform = tf(a * 0.2, 0.6);
+    return g;
+  });
+
+  /* leaves: long blades. f = position along the stem, step = when it appears */
+  var LEAVES = [
+    { f: 0.08, rot: -118, k: 0.4, step: 1 }, { f: 0.08, rot: -62, k: 0.4, step: 1 },
+    { f: 0.20, rot: -128, k: 0.75, step: 2 }, { f: 0.26, rot: -54, k: 0.8, step: 2 },
+    { f: 0.36, rot: -116, k: 1.0, step: 3 }, { f: 0.44, rot: -64, k: 1.0, step: 3 }, { f: 0.56, rot: -126, k: 0.65, step: 3 }
+  ];
+  function setLeaf(d, on) {
+    d.el.style.transform = 'translate(' + d.x + 'px,' + d.y + 'px) rotate(' + d.rot + 'deg) scale(' + (on ? d.k : 0) + ')';
+  }
+  LEAVES.forEach(function (d) {
+    var p = stem.getPointAtLength(d.f * L);
+    d.x = p.x; d.y = p.y;
+    d.wrap = mk('g', {}, leavesG);
+    d.el = mk('g', { 'class': 'leaf' }, d.wrap);
+    mk('path', { d: 'M0,0 C22,-16 66,-22 120,-2 C68,-2 26,6 0,0 Z', 'class': 'lf' }, d.el);
+    mk('path', { d: 'M4,0 C32,-9 72,-11 108,-3', 'class': 'vein' }, d.el);
+    setLeaf(d, false);
+  });
+
+  /* dots */
+  var dots = [];
+  for (var i = 0; i < 6; i++) { var s = document.createElement('span'); s.className = 'dot'; dotsEl.appendChild(s); dots.push(s); }
+
+  /* fireflies */
+  for (var j = 0; j < 18; j++) {
+    var f = document.createElement('span');
+    var size = 3 + Math.random() * 3;
+    f.className = 'fly';
+    f.style.left = (Math.random() * 100) + '%';
+    f.style.top = (Math.random() * 90) + '%';
+    f.style.width = f.style.height = size + 'px';
+    f.style.setProperty('--x', (Math.random() * 60 - 30) + 'px');
+    f.style.setProperty('--y', (Math.random() * 60 - 30) + 'px');
+    f.style.setProperty('--d', (7 + Math.random() * 8) + 's');
+    f.style.setProperty('--t', (3 + Math.random() * 4) + 's');
+    f.style.animationDelay = (-Math.random() * 8) + 's, ' + (-Math.random() * 6) + 's';
+    flies.appendChild(f);
+  }
+
+  /* camera */
+  function aspect() {
+    var r = svg.getBoundingClientRect();
+    return (r.width || 360) / (r.height || 640);
+  }
+  function apply(c) {
+    var w = c.h * aspect();
+    svg.setAttribute('viewBox', (c.cx - w / 2) + ' ' + (c.cy - c.fy * c.h) + ' ' + w + ' ' + c.h);
+  }
+  function camFor(n) {
+    var a = aspect();
+    function c(cx, cy, h, fy, minW) { return { cx: cx, cy: cy, h: Math.max(h, (minW || 0) / a), fy: fy }; }
+    if (n === 0) return c(200, 590, 240, 0.42, 150);
+    if (n === 1) return c(200, 565, 300, 0.42, 170);
+    if (n === 2) return c(200, 490, 440, 0.42, 220);
+    if (n === 3) return c(200, 440, 640, 0.40, 330);
+    if (n <= 9) {
+      var ang = OPEN_A[n - 4] * Math.PI / 180;
+      return c(hx + 72 * Math.sin(ang), hy - 72 * Math.cos(ang), 190, 0.36, 120);
+    }
+    if (n === 10) return c(hx, hy - 20, 360, 0.40, 250);
+    return c(200, 120, 900, 0.04, 420);
+  }
+  var cam = camFor(0), raf = 0, tweening = false;
+  function ease(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+  function tweenTo(t, ms) {
+    cancelAnimationFrame(raf);
+    var s = { cx: cam.cx, cy: cam.cy, h: cam.h, fy: cam.fy };
+    var t0 = performance.now();
+    tweening = true;
+    function step(now) {
+      var p = Math.min(1, (now - t0) / ms), e = ease(p);
+      cam = {
+        cx: s.cx + (t.cx - s.cx) * e,
+        cy: s.cy + (t.cy - s.cy) * e,
+        h: Math.exp(Math.log(s.h) + (Math.log(t.h) - Math.log(s.h)) * e),
+        fy: s.fy + (t.fy - s.fy) * e
+      };
+      apply(cam);
+      if (p < 1) raf = requestAnimationFrame(step); else tweening = false;
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  /* wind: the stem bends like a cantilever and the wave travels up it,
+     so the head and the leaves follow the stem with a small delay */
+  var NB = 28, base = [];
+  for (var q = 0; q <= NB; q++) {
+    var bp = stem.getPointAtLength(L * q / NB);
+    base.push({ x: bp.x, y: bp.y, u: q / NB });
+  }
+  var AMP = 18, swayOn = false, swayStart = 0;
+  function wind(t) {
+    var g = 0.78 + 0.22 * Math.sin(t * 0.25);
+    return (0.25 + 0.5 * Math.sin(t * 0.8) + 0.3 * Math.sin(t * 1.9 + 1.2) + 0.12 * Math.sin(t * 3.3 + 0.4)) * g;
+  }
+  function bend(u, t, r) { return AMP * r * u * u * wind(t - 0.45 * u); }
+  function tilt(u, t, r) {
+    var u1 = Math.min(1, u + 0.02), u0 = Math.max(0, u - 0.02);
+    return Math.atan((bend(u1, t, r) - bend(u0, t, r)) / ((u1 - u0) * L)) * 57.2958;
+  }
+  function swayFrame(now) {
+    var t = Math.max(0, (now - swayStart) / 1000);
+    var r = Math.min(1, t / 3.5);
+    r = r * r * (3 - 2 * r);
+    var pts = base.map(function (p) { return { x: p.x + bend(p.u, t, r), y: p.y }; });
+    var d = 'M' + pts[0].x + ',' + pts[0].y;
+    for (var i = 1; i < pts.length - 1; i++) {
+      d += ' Q' + pts[i].x + ',' + pts[i].y + ' ' + (pts[i].x + pts[i + 1].x) / 2 + ',' + (pts[i].y + pts[i + 1].y) / 2;
+    }
+    d += ' L' + pts[pts.length - 1].x + ',' + pts[pts.length - 1].y;
+    stem.setAttribute('d', d);
+    head.setAttribute('transform', 'translate(' + bend(1, t, r) + ' 0) rotate(' + (tilt(1, t, r) + r * 3.2 * Math.sin(t * 1.4 - 0.9)) + ' ' + hx + ' ' + hy + ')');
+    LEAVES.forEach(function (lf) {
+      var th = tilt(lf.f, t, r) + r * (5.5 * wind(t - 0.45 * lf.f - 0.2) + 3 * Math.sin(t * 2.2 + lf.f * 9 + lf.rot * 0.05));
+      lf.wrap.setAttribute('transform', 'translate(' + bend(lf.f, t, r) + ' 0) rotate(' + th + ' ' + lf.x + ' ' + lf.y + ')');
+    });
+    requestAnimationFrame(swayFrame);
+  }
+  function startSway() {
+    if (reduce || swayOn) return;
+    swayOn = true;
+    stem.style.transition = 'none';
+    stem.style.strokeDasharray = 'none';
+    stem.style.strokeDashoffset = '0';
+    swayStart = performance.now();
+    requestAnimationFrame(swayFrame);
+  }
+
+  /* story */
+  var FINAL = 'เค้ารู้สึกผิดจริงๆคั้บเค้าอยากทำมาให้อ้วนนะ รักเธอครับ';
+  var STEPS = [
+    { t: 'วันนี้เค้านิสัยไม่ดีใส่อ้วนเลย', b: 'ลองกดดูนะคั้บ' },
+    { t: 'เค้าอยากจะขอโทษเธอมากๆคั้บที่พิมพ์ไม่ดีกับเธอ', b: '╯︿╰' },
+    { t: 'เค้าไม่ได้อยากจะคุมเธอไว้รึอะไรเลยคั้บเค้าหึงหวงได้เธอบอกแล้วแต่แบบนี้มันก็ไม่ถูกที่แบบนั้น', b: '〒▽〒' },
+    { t: 'ต่อไปเค้าจะไม่ทำแบบนั้นแล้วคั้บเค้าจะบอกอ้วนดีๆไม่พิมพ์ไม่ดีใส่อ้วนแล้ว', b: 'เชื่อใจเค้าได้เลย🐥' },
+    { t: 'เค้าอยากให้อ้วนกลับมาร่าเริงเป็นเด็กดื้อของเค้าเหมือนเดิมเร็วๆแล้ว', b: 'คิดถึงเธอมากๆเลย' },
+    { t: 'เค้ารู้ว่าเธอบอกว่าเข้าใจแล้ว แต่ใจอาจยังไม่หายทันที ไม่เป็นไรนะ เธอใช้เวลาได้เต็มที่เลย', b: 'เค้ารอได้คั้บ' },
+    { t: 'แต่ตอนที่อ้วนร่าเริงอะมันน่ารักมากกกเลยนะแบบ หมูดื้อๆอ้วนๆวิ่งไปมาเลยอะะะ', b: '🐽' },
+    { t: 'ถึงเธอจะโตแล้ว แต่ตอนที่เธอทำตัวเหมือนเด็ก เค้าว่าน่ารักที่สุดเลย', b: '(✿◠‿◠)' },
+    { t: 'ถ้าอ้วนมีอะไรอยากบอกเค้า อ้วนก็บอกเค้าได้ตลอดเลยนะเค้าจะรับฟังเองคั้บ', b: 'สุดท้ายแล้ววว' },
+    { t: 'เค้าแค่อยากทำอะไรให้เธอยิ้มได้นิดนึง เค้ารักเธอมากๆเลยนะะ', b: 'ดูดอกไม้ที่เธอทำสิๆๆ' },
+    { t: FINAL, b: 'ดอกทิวลิบที่อ้วนชอบไงงง', sign: true },
+    { t: FINAL, b: 'มันซูมได้ ดั๊วะนะะ', sign: true }
+  ];
+  var FR = [0, 0.16, 0.52, 1];
+  var cur = 0, lock = false, tTimer = 0, uTimer = 0;
+
+  function goTo(n, instant) {
+    var from = cur;
+    cur = n;
+    var keepText = from >= 10 && n >= 10;
+    var dur = instant ? 0 : reduce ? 500 : n === 0 ? 2600 : n <= 3 ? 3200 : n <= 9 ? 3600 : n === 10 ? 4200 : 3400;
+    if (instant) stage.classList.add('instant');
+
+    var frFrom = FR[Math.min(from, 3)], frTo = FR[Math.min(n, 3)];
+    stem.style.transition = instant ? 'none' : 'stroke-dashoffset ' + Math.round(dur * 0.92) + 'ms ease-in-out';
+    stem.style.strokeDashoffset = L * (1 - frTo);
+
+    seed.classList.toggle('gone', n > 0);
+
+    LEAVES.forEach(function (d) {
+      var on = n >= d.step, delay = 0;
+      if (on && from < d.step && frTo > frFrom) delay = Math.max(0, (d.f - frFrom) / (frTo - frFrom)) * dur * 0.8;
+      d.el.style.transitionDelay = Math.round(delay) + 'ms';
+      setLeaf(d, on);
+    });
+
+    head.style.transitionDelay = (n >= 3 && from < 3) ? Math.round(dur * 0.6) + 'ms' : '0ms';
+    head.style.opacity = n >= 3 ? 1 : 0;
+
+    petals.forEach(function (g, i) {
+      var open = n >= 4 + i;
+      g.style.transitionDelay = open ? '250ms' : '0ms';
+      g.style.transform = open ? tf(OPEN_A[i], OPEN_S[i]) : tf(OPEN_A[i] * 0.2, 0.6);
+      g.classList.toggle('active', n === 4 + i);
+    });
+    svg.classList.toggle('zoomed', n >= 4 && n <= 9);
+
+    glow.style.opacity = n < 4 ? 0 : n >= 10 ? 1 : 0.12 + 0.1 * (n - 4);
+
+    var opened = Math.max(0, Math.min(6, n - 3));
+    dots.forEach(function (d, i) { d.classList.toggle('on', i < opened); });
+    dotsEl.setAttribute('aria-label', 'กลีบที่บานแล้ว ' + opened + ' จาก 6');
+
+    if (instant) { cam = camFor(n); apply(cam); } else { tweenTo(camFor(n), dur); }
+
+    clearTimeout(tTimer); clearTimeout(uTimer);
+    if (!keepText) { txt.classList.remove('show'); sign.classList.remove('show'); }
+    lock = true;
+    btn.setAttribute('aria-disabled', 'true');
+
+    tTimer = setTimeout(function () {
+      btn.textContent = STEPS[n].b;
+      if (keepText) return;
+      txt.textContent = STEPS[n].t;
+      sign.hidden = !STEPS[n].sign;
+      requestAnimationFrame(function () {
+        txt.classList.add('show');
+        if (STEPS[n].sign) sign.classList.add('show');
+      });
+    }, instant ? 0 : Math.round(dur * (keepText ? 0.5 : 0.62)));
+
+    if (n >= 10) startSway();
+
+    uTimer = setTimeout(function () {
+      lock = false;
+      btn.removeAttribute('aria-disabled');
+    }, instant ? 0 : dur);
+
+    if (instant) {
+      void stage.offsetWidth;
+      requestAnimationFrame(function () { stage.classList.remove('instant'); });
+    }
+  }
+
+  document.addEventListener('click', function () {
+    if (lock) return;
+    goTo(cur === 10 ? 11 : cur === 11 ? 10 : cur + 1, false);
+  });
+
+  function onResize() { if (!tweening) { cam = camFor(cur); apply(cam); } }
+  if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(stage);
+  else window.addEventListener('resize', onResize);
+
+  goTo(0, true);
+})();
+</script>
+
+</body></html>
